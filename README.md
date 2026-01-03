@@ -7,7 +7,7 @@
 
 ### 📚 קישורים
 
-📄 **[מדריך לשימוש](https://docs.google.com/document/d/1999ObsqyLAaNgCQgi3Ihe2Rg88zV1tMvsEm3UTwrn3M/edit?tab=t.0)**
+📄 **[מסמך שימוש בתשתיות](https://docs.google.com/document/d/1999ObsqyLAaNgCQgi3Ihe2Rg88zV1tMvsEm3UTwrn3M/edit?tab=t.0)**
 המסמך שמסביר איך להשתמש בספרייה.
 
 מערכת ווידג'טים מותאמת אישית ל-Elastic Dashboard:
