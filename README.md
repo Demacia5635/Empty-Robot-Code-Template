@@ -12,6 +12,3 @@
 
 מערכת ווידג'טים מותאמת אישית ל-Elastic Dashboard:
 🔗 **[Demacia Widgets for Elastic Dashboard](https://github.com/Demacia5635/Elastic_Dashboard-Demacia_Widgets)**
-
----
-**נכתב על ידי צוות התוכנה של Demacia #5635**
