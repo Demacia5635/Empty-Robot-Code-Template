@@ -11,7 +11,24 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.demacia.utils.DemaciaUtils;
+import frc.demacia.utils.chassis.Chassis;
+import frc.demacia.utils.controller.CommandController;
+import frc.demacia.utils.controller.CommandController.ControllerType;
 import frc.demacia.utils.log.LogManager;
+import frc.demacia.utils.mechanisms.DriveCommand;
+import frc.robot.arm.ArmConstants.AngleChangeConstants;
+import frc.robot.arm.ArmConstants.TelescopeConstants;
+import frc.robot.arm.commands.ArmCalibration;
+import frc.robot.arm.commands.ArmCommand;
+import frc.robot.arm.subsystems.Arm;
+import frc.robot.chassisConstants.ChassisConstants;
+import frc.robot.intake.commands.IntakeToggle;
+import frc.robot.intake.commands.OuttakeToggle;
+import frc.robot.intake.subsystems.IntakeSubsystem;
+import frc.robot.shooter.commands.AngleCalibration;
+import frc.robot.shooter.commands.ShooterAutoFire;
+import frc.robot.shooter.commands.ShooterStateFire;
+import frc.robot.shooter.subsystems.Shooter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -27,6 +44,15 @@ public class RobotContainer implements Sendable{
 
   // The robot's subsystems and commands are defined here...
 
+  private final Chassis chassis;
+  private final frc.demacia.utils.chassis.DriveCommand driveCommand;
+
+  public static CommandController driverController;
+
+  private final Arm arm;
+  private final Shooter shooter;
+  private final IntakeSubsystem intake;
+
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
 
@@ -34,6 +60,15 @@ public class RobotContainer implements Sendable{
   public RobotContainer() {
     SmartDashboard.putData("RC", this);
     new DemaciaUtils(() -> getIsComp(), () -> getIsRed());
+
+    driverController = new CommandController(0, ControllerType.kXbox);
+
+    chassis = new Chassis(ChassisConstants.CHASSIS_CONFIG);
+    driveCommand = new frc.demacia.utils.chassis.DriveCommand(chassis, driverController);
+
+    arm = new Arm();
+    shooter = new Shooter();
+    intake = new IntakeSubsystem();
     
     // Configure the trigger bindings
     configureBindings();
@@ -49,7 +84,26 @@ public class RobotContainer implements Sendable{
    * joysticks}.
    */
   private void configureBindings() {
+    chassis.setDefaultCommand(driveCommand);
+    arm.setDefaultCommand(new ArmCommand(arm));
+    shooter.setDefaultCommand(new ShooterStateFire(shooter));
     
+    driverController.upButton().onTrue(new ArmCalibration(arm));
+    driverController.downButton().onTrue(new AngleCalibration(shooter));
+
+    driverController.getLeftStickMove().whileTrue(
+      new DriveCommand(arm, TelescopeConstants.MOTOR_NAME, () -> driverController.getLeftY() * -0.3)
+    );
+    
+    driverController.getRightStickMove().whileTrue(
+      new DriveCommand(arm, AngleChangeConstants.MOTOR_NAME, () -> driverController.getRightY() * 0.3)
+    );
+
+    driverController.povDown().whileTrue(new ShooterAutoFire(shooter));
+
+    driverController.rightButton().whileTrue(new IntakeToggle(intake));
+    
+    driverController.leftBumper().whileTrue(new OuttakeToggle(intake));
   }
 
   public static boolean getIsRed() {
